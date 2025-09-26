@@ -1,55 +1,64 @@
 pipeline {
   agent any
 
-  tools {
-    // Deben existir en Manage Jenkins → Tools con estos nombres
-    jdk 'jdk-21'
-    maven 'maven-3.9'
+  // Jenkins añadirá estos tools al PATH automáticamente.
+  tools { 
+    jdk 'jdk-21'          // <-- sin modificar PATH a mano
+    maven 'maven-3.9'     // <-- sin modificar PATH a mano
   }
 
   options { timestamps() }
 
   stages {
     stage('Checkout') {
-      steps { checkout scm }
+      steps {
+        checkout scm
+      }
     }
 
-    // Info rápida y robusta del entorno (una sola línea, sin tocar PATH manualmente)
+    // === DIAGNÓSTICO: información de Java/Maven y PATH ===
     stage('Java & Maven info') {
       steps {
-        sh 'set -euxo pipefail; echo "JAVA_HOME=${JAVA_HOME}"; which sh; which java; java -version; which mvn; mvn -v'
+        // NOTA: Sin withEnv ni overrides de PATH. Evitamos el bug JENKINS-41339.
+        sh '''
+          set -e
+          echo "JAVA_HOME=${JAVA_HOME}"
+          echo "MAVEN_HOME=${MAVEN_HOME}"
+          echo "PATH=${PATH}"
+          which sh || true
+          which java || true
+          which mvn || true
+          java -version
+          mvn -v
+        '''
       }
     }
 
     stage('Unit Tests + HTML Report') {
       steps {
-        // Ejecuta tests y genera el HTML con maven-surefire-report-plugin
-        sh 'set -euxo pipefail; mvn -B -Dmaven.test.failure.ignore=true test surefire-report:report'
-
-        // Opcional: generar PDF si tienes wkhtmltopdf en el agente
-        // sh 'if [ -f target/site/surefire-report.html ]; then wkhtmltopdf target/site/surefire-report.html target/surefire-report.pdf; fi'
+        // Ejecuta tests y genera el reporte HTML de Surefire
+        sh 'mvn -B -Dmaven.test.failure.ignore=true test surefire-report:report'
       }
     }
   }
 
   post {
     always {
-      // Publica resultados JUnit aunque no existan (no falla el build por eso)
-      junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
+      // Publica resultados JUnit
+      junit 'target/surefire-reports/*.xml'
 
-      // Publica el reporte HTML (no fallar si falta)
+      // Publica el reporte HTML de Surefire
       publishHTML(target: [
         reportDir: 'target/site',
         reportFiles: 'surefire-report.html',
         reportName: 'Unit Test Report',
         keepAll: true,
         alwaysLinkToLastBuild: true,
-        allowMissing: true
+        allowMissing: false
       ])
 
-      // Archiva artefactos (no fallar si faltan)
-      archiveArtifacts artifacts: 'target/site/surefire-report.html', fingerprint: true, allowEmptyArchive: true
-      archiveArtifacts artifacts: 'target/surefire-report.pdf', fingerprint: true, allowEmptyArchive: true
+      // (Opcional) si luego conviertes a PDF, aquí lo archivaría también.
+      archiveArtifacts artifacts: 'target/site/surefire-report.html', fingerprint: true
     }
   }
 }
