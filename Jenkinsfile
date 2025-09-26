@@ -38,17 +38,7 @@ pipeline {
       steps {
         // Ejecuta tests y genera el reporte HTML de Surefire
         sh 'mvn -B -Dmaven.test.failure.ignore=true test surefire-report:report'
-
-        // ⬇️ CAMBIO 1: generar sitio y PDF (requiere maven-pdf-plugin en el pom)
-        sh '''
-          set -e
-          mvn -B site pdf:pdf
-          # El pdf típico queda en target/site/pdf/site.pdf (según la config del pom)
-          # Lo copiamos a un nombre estable para archivarlo fácil:
-          if [ -f target/site/pdf/site.pdf ]; then
-            cp target/site/pdf/site.pdf target/surefire-report.pdf
-          fi
-        '''
+        // (Se elimina la generación de site y PDF)
       }
     }
   }
@@ -71,8 +61,7 @@ pipeline {
       // Archiva el HTML
       archiveArtifacts artifacts: 'target/site/surefire-report.html', fingerprint: true
 
-      // ⬇️ CAMBIO 2: archivar el PDF si existe
-      archiveArtifacts artifacts: 'target/surefire-report.pdf', fingerprint: true, allowEmptyArchive: true
+      // (Se elimina el archivado del PDF)
     }
   }
 }
