@@ -58,7 +58,7 @@ public class TestCalculadoraAvanzada {
     }
     
     @Test
-void testMax() {
+public void testMax() {
     CalculadoraAvanzada calc = new CalculadoraAvanzada();
     assertEquals(9, calc.max(1, 9, 3, 5));
     assertEquals(-1, calc.max(-5, -10, -1));
@@ -66,13 +66,13 @@ void testMax() {
 }
 
 @Test
-void testMaxSinArgumentos() {
+public void testMaxSinArgumentos() {
     CalculadoraAvanzada calc = new CalculadoraAvanzada();
     assertThrows(IllegalArgumentException.class, () -> calc.max());
 }
 
 @Test
-void testPotencia() {
+public void testPotencia() {
     CalculadoraAvanzada calc = new CalculadoraAvanzada();
     assertEquals(1, calc.potencia(5, 0), "Todo número a la potencia 0 es 1");
     assertEquals(8, calc.potencia(2, 3));
@@ -81,7 +81,7 @@ void testPotencia() {
 }
 
 @Test
-void testPotenciaExponenteNegativo() {
+public void testPotenciaExponenteNegativo() {
     CalculadoraAvanzada calc = new CalculadoraAvanzada();
     assertThrows(IllegalArgumentException.class, () -> calc.potencia(2, -3));
 }
