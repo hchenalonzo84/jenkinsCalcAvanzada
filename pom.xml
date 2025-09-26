@@ -32,69 +32,21 @@
 
   <build>
     <plugins>
-      <!-- Runner de tests (JUnit 5 soportado por esta versión) -->
+      <!-- Runner de tests -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.2.5</version>
       </plugin>
 
-      <!-- Reporte HTML de Surefire (genera target/site/surefire-report.html) -->
+      <!-- Reporte HTML: target/site/surefire-report.html -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
         <version>3.2.5</version>
-      </plugin>
-
-      <!-- Genera el sitio de Maven (necesario para convertir a PDF) -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>3.12.1</version>
-      </plugin>
-
-      <!-- Convierte el sitio a PDF -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-pdf-plugin</artifactId>
-        <version>1.6</version>
-        <dependencies>
-          <!-- Backend PDF de Doxia -->
-          <dependency>
-            <groupId>org.apache.maven.doxia</groupId>
-            <artifactId>doxia-module-pdf</artifactId>
-            <version>1.12.0</version>
-          </dependency>
-        </dependencies>
-        <configuration>
-          <!-- Dónde deja el PDF -->
-          <outputDirectory>${project.build.directory}/site/pdf</outputDirectory>
-        </configuration>
       </plugin>
     </plugins>
   </build>
-
-  <!-- Hace que el site incluya el surefire-report -->
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>3.2.5</version>
-        <configuration>
-          <outputName>surefire-report</outputName>
-        </configuration>
-      </plugin>
-      <!-- (Opcional) información del proyecto en el site -->
-      <!--
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>3.5.0</version>
-      </plugin>
-      -->
-    </plugins>
-  </reporting>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
